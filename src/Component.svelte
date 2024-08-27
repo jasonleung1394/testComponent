@@ -41,7 +41,6 @@
           "_id",
           "task_name",
           "status",
-          "description",
           "_rev",
           "type",
           "tableId",
@@ -129,7 +128,7 @@
       ...row,
       status: task.status,
       task_name: task.task_name,
-      description: task.description,
+      // description: task.description,
       ...Object.fromEntries(
         Object.entries(task).filter(([key]) => additionalColumns[key])
       ),
@@ -177,7 +176,7 @@
     // Create a new task object
     const newTask = {
       task_name: task.task_name,
-      description: task.description,
+      // description: task.description,
       status: task.status,
       ...Object.fromEntries(
         Object.entries(task).filter(([key]) => additionalColumns[key])
@@ -207,7 +206,7 @@
 
   let newTask = {
     task_name: "",
-    description: "",
+    // description: "",
     status: columnOrder[0], // Default to the first column's status
     ...Object.fromEntries(
       Object.keys(additionalColumns).map((key) => [key, ""])
@@ -217,7 +216,7 @@
   function openAddTaskPopup() {
     newTask = {
       task_name: "",
-      description: "",
+      // description: "",
       status: columnOrder[0], // Reset to default values
       ...Object.fromEntries(
         Object.keys(additionalColumns).map((key) => [key, ""])
@@ -329,17 +328,26 @@
           <div class="btn-container">
             <button on:click={() => openEditPopup(task._id)}>Edit</button>
           </div>
-          {#if !is_empty(task.description)}
+          <!-- {#if !is_empty(task.description)}
             <div class="description-container">
               {@html marked(task.description)}
             </div>
-          {/if}
+          {/if} -->
           <div class="additional-container">
             {#each Object.entries(additionalColumns) as [key, _]}
               {#if !is_empty(task[key])}
                 <div class="additional-column">
                   <strong>{key.charAt(0).toUpperCase() + key.slice(1)}:</strong>
-                  {task[key]}
+                  {#if key === "description"}
+                    <!-- Render as Markdown -->
+                    {@html marked(task[key])}
+                  {:else if key === "date"}
+                    <!-- Format Date -->
+                    <p>{new Date(task[key]).toLocaleDateString()}</p>
+                  {:else}
+                    <!-- Default Display -->
+                    <p>{task[key]}</p>
+                  {/if}
                 </div>
               {/if}
             {/each}
@@ -358,10 +366,10 @@
         Task Name:
         <input type="text" bind:value={editableTask.task_name} />
       </label>
-      <label>
+      <!-- <label>
         Description:
         <textarea bind:value={editableTask.description}></textarea>
-      </label>
+      </label> -->
       <label>
         Status:
         <select bind:value={editableTask.status}>
@@ -375,7 +383,17 @@
       {#each Object.keys(additionalColumns) as column}
         <label>
           {column.charAt(0).toUpperCase() + column.slice(1)}:
-          <input type="text" bind:value={editableTask[column]} />
+          {#if column === "description"}
+            <!-- Render as a Markdown Editor -->
+            <textarea bind:value={editableTask[column]} rows="4" cols="50"
+            ></textarea>
+          {:else if column === "date"}
+            <!-- Render as a Date Picker -->
+            <input type="date" bind:value={editableTask[column]} />
+          {:else}
+            <!-- Default Input Field -->
+            <input type="text" bind:value={editableTask[column]} />
+          {/if}
         </label>
       {/each}
       <div class="btn-group">
@@ -413,10 +431,10 @@
       Task Name:
       <input type="text" bind:value={newTask.task_name} />
     </label>
-    <label>
+    <!-- <label>
       Description:
       <textarea bind:value={newTask.description}></textarea>
-    </label>
+    </label> -->
     <label>
       Status:
       <select bind:value={newTask.status}>
@@ -430,7 +448,16 @@
     {#each Object.keys(additionalColumns) as column}
       <label>
         {column.charAt(0).toUpperCase() + column.slice(1)}:
-        <input type="text" bind:value={newTask[column]} />
+        {#if column === "description"}
+          <!-- Render as a Markdown Editor or Textarea -->
+          <textarea bind:value={newTask[column]} rows="4" cols="50"></textarea>
+        {:else if column === "date"}
+          <!-- Render as a Date Picker -->
+          <input type="date" bind:value={newTask[column]} />
+        {:else}
+          <!-- Default Input Field for other types -->
+          <input type="text" bind:value={newTask[column]} />
+        {/if}
       </label>
     {/each}
     <div class="btn-group">
