@@ -50,12 +50,29 @@
         let outObjs = fieldSelection.filter((field) => field.active === false);
         let outNames = outObjs.map((objs) => objs.field);
         excludedColumns = excludedColumns.concat(outNames);
-        additionalColumns = Object.keys(firstRow).reduce((acc, key) => {
-          if (!excludedColumns.includes(key)) {
-            acc[key] = key; // Store column name (or further process if needed)
+
+        // Record sequence of relevant fields
+        const relevantFields = fieldSelection
+          .filter(
+            (field) =>
+              field.active === true && !excludedColumns.includes(field.field)
+          )
+          .map((field) => field.field);
+        // Ensure sequence in additionalColumns
+        additionalColumns = relevantFields.reduce((acc, field) => {
+          if (firstRow.hasOwnProperty(field)) {
+            acc[field] = field;
           }
           return acc;
         }, {});
+        // Append any remaining columns that are not in relevantFields
+        Object.keys(firstRow).forEach((key) => {
+          if (!excludedColumns.includes(key) && !relevantFields.includes(key)) {
+            additionalColumns[key] = key;
+          }
+        });
+
+        console.log(additionalColumns);
       }
     }
   }
