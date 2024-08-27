@@ -1,0 +1,11 @@
+{
+  "version": "1.0",
+  "apis": [
+    {
+      "identifier": "budibase",
+      "source": "@budibase/v2.22.1#p44qd2ilvl3fzgk",
+      "integrity": "sha512-FHMf26y3pTbkeB30ltrJm5g2K+eT+GXXQ/GYHdZqbJF7UTCM7M9Sxhn3mJ4jmKKG36JTnODnC7U8w8Fyd1l5Tg==",
+      "installerVersion": "6.1.2"
+    }
+  ]
+}
