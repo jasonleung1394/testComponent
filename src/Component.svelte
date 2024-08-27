@@ -26,9 +26,9 @@
     if (dataProvider?.rows) {
       tasks = dataProvider.rows.map((obj) => ({
         id: obj.auto_id,
-        task_name: obj.Title,
-        status: obj.Status,
-        description: obj.Description,
+        task_name: obj.task_name,
+        status: obj.status,
+        description: obj.description,
         _id: obj._id,
         ...obj, // Spread the rest of the object properties
       }));
