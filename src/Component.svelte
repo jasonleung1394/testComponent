@@ -55,9 +55,12 @@
         const relevantFields = fieldSelection
           .filter(
             (field) =>
-              field.active === true && !excludedColumns.includes(field.field)
+              field.active === true &&
+              !excludedColumns.includes(field.field) &&
+              typeof firstRow[field.field] !== "object" // Exclude objects
           )
           .map((field) => field.field);
+
         // Ensure sequence in additionalColumns
         additionalColumns = relevantFields.reduce((acc, field) => {
           if (firstRow.hasOwnProperty(field)) {
@@ -65,14 +68,17 @@
           }
           return acc;
         }, {});
-        // Append any remaining columns that are not in relevantFields
+
+        // Append any remaining columns that are not in relevantFields and are not objects
         Object.keys(firstRow).forEach((key) => {
-          if (!excludedColumns.includes(key) && !relevantFields.includes(key)) {
+          if (
+            !excludedColumns.includes(key) &&
+            !relevantFields.includes(key) &&
+            typeof firstRow[key] !== "object" // Exclude objects
+          ) {
             additionalColumns[key] = key;
           }
         });
-
-        console.log(additionalColumns);
       }
     }
   }
@@ -204,8 +210,6 @@
 
     // Save the new task to the database
     let response = await saveNewTask(newTask);
-    console.log(response);
-
     let savedNewTask = {
       ...newTask,
       _id: response._id,
@@ -354,13 +358,25 @@
             {#each Object.entries(additionalColumns) as [key, _]}
               {#if !is_empty(task[key])}
                 <div class="additional-column">
-                  <strong>{key.charAt(0).toUpperCase() + key.slice(1)}:</strong>
+                  <!-- Trim '_text' and capitalize key for display -->
+                  <strong>
+                    {#if key.endsWith("_text")}
+                      {key.slice(0, -5).charAt(0).toUpperCase() +
+                        key.slice(1, -5)}:
+                    {:else}
+                      {key.charAt(0).toUpperCase() + key.slice(1)}:
+                    {/if}
+                  </strong>
+
                   {#if key === "description"}
                     <!-- Render as Markdown -->
                     {@html marked(task[key])}
                   {:else if key === "date"}
                     <!-- Format Date -->
                     <p>{new Date(task[key]).toLocaleDateString()}</p>
+                  {:else if key.endsWith("_text")}
+                    <!-- Default Display, read-only for _text fields -->
+                    <p>{task[key]}</p>
                   {:else}
                     <!-- Default Display -->
                     <p>{task[key]}</p>
@@ -399,17 +415,23 @@
       </label>
       {#each Object.keys(additionalColumns) as column}
         <label>
-          {column.charAt(0).toUpperCase() + column.slice(1)}:
-          {#if column === "description"}
-            <!-- Render as a Markdown Editor -->
-            <textarea bind:value={editableTask[column]} rows="4" cols="50"
-            ></textarea>
-          {:else if column === "date"}
-            <!-- Render as a Date Picker -->
-            <input type="date" bind:value={editableTask[column]} />
+          {#if column.endsWith("_text")}
+            <!-- Trim "_text" and disable the text field -->
+            {column.slice(0, -5).charAt(0).toUpperCase() + column.slice(1, -5)}:
+            <input type="text" bind:value={editableTask[column]} disabled />
           {:else}
-            <!-- Default Input Field -->
-            <input type="text" bind:value={editableTask[column]} />
+            {column.charAt(0).toUpperCase() + column.slice(1)}:
+            {#if column === "description"}
+              <!-- Render as a Markdown Editor -->
+              <textarea bind:value={editableTask[column]} rows="4" cols="50"
+              ></textarea>
+            {:else if column === "date"}
+              <!-- Render as a Date Picker -->
+              <input type="date" bind:value={editableTask[column]} />
+            {:else}
+              <!-- Default Input Field -->
+              <input type="text" bind:value={editableTask[column]} />
+            {/if}
           {/if}
         </label>
       {/each}
@@ -463,20 +485,25 @@
       </select>
     </label>
     {#each Object.keys(additionalColumns) as column}
-      <label>
-        {column.charAt(0).toUpperCase() + column.slice(1)}:
-        {#if column === "description"}
-          <!-- Render as a Markdown Editor or Textarea -->
-          <textarea bind:value={newTask[column]} rows="4" cols="50"></textarea>
-        {:else if column === "date"}
-          <!-- Render as a Date Picker -->
-          <input type="date" bind:value={newTask[column]} />
-        {:else}
-          <!-- Default Input Field for other types -->
-          <input type="text" bind:value={newTask[column]} />
-        {/if}
-      </label>
+      {#if !column.endsWith("_text")}
+        <!-- Exclude fields ending with '_text' -->
+        <label>
+          {column.charAt(0).toUpperCase() + column.slice(1)}:
+          {#if column === "description"}
+            <!-- Render as a Markdown Editor or Textarea -->
+            <textarea bind:value={newTask[column]} rows="4" cols="50"
+            ></textarea>
+          {:else if column === "date"}
+            <!-- Render as a Date Picker -->
+            <input type="date" bind:value={newTask[column]} />
+          {:else}
+            <!-- Default Input Field for other types -->
+            <input type="text" bind:value={newTask[column]} />
+          {/if}
+        </label>
+      {/if}
     {/each}
+
     <div class="btn-group">
       <button type="button" on:click={closeAddTaskPopup}>Cancel</button>
       <button type="submit">Add Task</button>
