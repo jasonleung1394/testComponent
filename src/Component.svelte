@@ -28,7 +28,7 @@
         id: obj.auto_id,
         task_name: obj.task_name,
         status: obj.status,
-        description: obj.description,
+        // description: obj.description,
         _id: obj._id,
         ...obj, // Spread the rest of the object properties
       }));
@@ -49,6 +49,7 @@
         ];
         let outObjs = fieldSelection.filter((field) => field.active === false);
         let outNames = outObjs.map((objs) => objs.field);
+        outNames.map((name) => outNames.push(name + "_text")); //exclude the _text field.
         excludedColumns = excludedColumns.concat(outNames);
 
         // Record sequence of relevant fields
@@ -79,6 +80,8 @@
             additionalColumns[key] = key;
           }
         });
+        console.log(additionalColumns);
+        
       }
     }
   }
@@ -512,6 +515,9 @@
 </div>
 
 <style>
+  body{
+    font-family: Arial, Helvetica, sans-serif;
+  }
   :root {
     --pr--button-color: rgb(13, 102, 208);
     --pr--button-color-hover: rgb(20, 115, 230);
@@ -583,7 +589,7 @@
     position: relative;
     display: grid;
     grid-template-areas:
-      "title ph ph edit"
+      "title title ph edit"
       "description description description description"
       "additional additional additional additional";
     grid-template-rows: auto;
@@ -596,6 +602,7 @@
 
   .kanban-card h3 {
     grid-area: title;
+    text-transform: capitalize;
   }
   .btn-container {
     grid-area: edit;
@@ -626,7 +633,7 @@
     opacity: 0;
     transition:
       visibility 0s,
-      opacity 0.2s ease-in-out;
+      opacity 0.5s ease-in-out;
     height: 0px;
   }
 
@@ -642,7 +649,7 @@
     opacity: 0;
     height: 0px;
     transition:
-      visibility 0s,
+      visibility 0.2s ease-in-out,
       opacity 0.2s ease-in-out;
   }
 
