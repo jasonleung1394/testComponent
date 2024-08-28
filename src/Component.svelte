@@ -26,9 +26,8 @@
     if (dataProvider?.rows) {
       tasks = dataProvider.rows.map((obj) => ({
         id: obj.auto_id,
-        task_name: obj.task_name,
+        task_name: obj.title,
         status: obj.status,
-        // description: obj.description,
         _id: obj._id,
         ...obj, // Spread the rest of the object properties
       }));
@@ -39,7 +38,7 @@
         let excludedColumns = [
           "auto_id",
           "_id",
-          "task_name",
+          "title",
           "status",
           "_rev",
           "type",
@@ -255,7 +254,7 @@
 
   function handleAddTask() {
     if (newTask.task_name.trim() === "") {
-      alert("Task name is required.");
+      alert("Title is required.");
       return;
     }
 
@@ -399,7 +398,7 @@
   {#if editableTask}
     <form on:submit|preventDefault={saveChanges}>
       <label>
-        Task Name:
+        Title:
         <input type="text" bind:value={editableTask.task_name} />
       </label>
       <!-- <label>
@@ -470,7 +469,7 @@
 <div class="add-task-popup" style="display: none;">
   <form on:submit|preventDefault={handleAddTask}>
     <label>
-      Task Name:
+      Title:
       <input type="text" bind:value={newTask.task_name} />
     </label>
     <!-- <label>
