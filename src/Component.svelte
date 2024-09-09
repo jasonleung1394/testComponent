@@ -311,7 +311,7 @@
     <!-- placeholder -->
   </div>
   <div class="btn-group">
-    <button on:click={openReorderPopup} style="float: right;">
+    <button on:click={openReorderPopup} style="float: right; display:none">
       Reorder Columns
     </button>
     <button
