@@ -26,7 +26,7 @@
     if (dataProvider?.rows) {
       tasks = dataProvider.rows.map((obj) => ({
         id: obj.auto_id,
-        task_name: obj.title,
+        title: obj.title,
         status: obj.status,
         _id: obj._id,
         ...obj, // Spread the rest of the object properties
@@ -152,7 +152,7 @@
     await API.saveRow({
       ...row,
       status: task.status,
-      task_name: task.task_name,
+      title: task.title,
       // description: task.description,
       ...Object.fromEntries(
         Object.entries(task).filter(([key]) => additionalColumns[key])
@@ -200,7 +200,7 @@
   async function addNewTask(task) {
     // Create a new task object
     const newTask = {
-      task_name: task.task_name,
+      title: task.title,
       // description: task.description,
       status: task.status,
       ...Object.fromEntries(
@@ -228,7 +228,7 @@
   }
 
   let newTask = {
-    task_name: "",
+    title: "",
     // description: "",
     status: columnOrder[0], // Default to the first column's status
     ...Object.fromEntries(
@@ -238,7 +238,7 @@
 
   function openAddTaskPopup() {
     newTask = {
-      task_name: "",
+      title: "",
       // description: "",
       status: columnOrder[0], // Reset to default values
       ...Object.fromEntries(
@@ -253,7 +253,7 @@
   }
 
   function handleAddTask() {
-    if (newTask.task_name.trim() === "") {
+    if (newTask.title.trim() === "") {
       alert("Title is required.");
       return;
     }
@@ -347,7 +347,7 @@
           draggable="true"
           on:dragstart={(event) => handleDragStart(event, task)}
         >
-          <h3>{task.task_name}</h3>
+          <h3>{task.title}</h3>
           <div class="btn-container">
             <button on:click={() => openEditPopup(task._id)}>Edit</button>
           </div>
@@ -399,7 +399,7 @@
     <form on:submit|preventDefault={saveChanges}>
       <label>
         Title:
-        <input type="text" bind:value={editableTask.task_name} />
+        <input type="text" bind:value={editableTask.title} />
       </label>
       <!-- <label>
         Description:
@@ -470,7 +470,7 @@
   <form on:submit|preventDefault={handleAddTask}>
     <label>
       Title:
-      <input type="text" bind:value={newTask.task_name} />
+      <input type="text" bind:value={newTask.title} />
     </label>
     <!-- <label>
       Description:
